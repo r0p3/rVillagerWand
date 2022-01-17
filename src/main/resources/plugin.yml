@@ -1,0 +1,71 @@
+name: RVillagerWand
+version: '${project.version}'
+main: me.r0p3.rvillagerwand.RVillagerWand
+api-version: 1.18
+authors: [ r0p3 ]
+description: Managing villagers have never been this easy
+commands:
+  wand:
+    description: Make a stick in the players main hand to a villager managing wand
+    usage: /<command>
+    permission: rvillagerwand.wand
+    permission-message: &cYou do not have the required permission for this command
+
+permissions:
+  rvillagerwand.convertzombie:
+    description: Lets the player convert a zombiefied villager into a regular villager, for the cost of 1 Golden Apple, This will not give discounted prices
+    default: false
+  rvillagerwand.drop:
+    description: Allow villager to drop its inventory when the wand is used to kill or force drop items from villager
+    default: true
+  rvillagerwand.follow:
+    description: Toggle if the villager will follow the player
+    default: true
+  rvillagerwand.gethp:
+    description: Gets the villagers hp
+    default: true
+  rvillagerwand.glow:
+    description: Makes the villager glow, cost 1 glowstone
+    default: true
+  rvillagerwand.heal:
+    description: Lets the player heal the villager
+    default: true
+  rvillagerwand.kill:
+    description: Let the player kill villagers with the Villager Wand
+    default: true
+  rvillagerwand.newtrades:
+    description: Lets the player get new trades without haveing to break and place the workstation
+    default: true
+  rvillagerwand.noitemsneeded:
+      description: Lets the player use the wand without the cost of some spells
+      default: false
+  rvillagerwand.pickup:
+    description: Lets the player pickup (Get a villager spawn egg) if the villager is grown up and has no profession
+    default: true
+  rvillagerwand.toggleai:
+    description: Lets the player toggle if the villager has AI
+    default: false
+  rvillagerwand.toggleinvisible:
+    description: Lets the player toggle if the villager is invisible
+    default: false
+  rvillagerwand.toggleinvulnerable:
+    description: Lets the player toggle if the villager is invulnerable
+    default: false
+  rvillagerwand.togglepickupitems:
+    description: Toggle if the villager can pick up items
+    default: true
+  rvillagerwand.togglesilent:
+      description: Lets the player toggle if villager should be silent
+      default: true
+  rvillagerwand.toggletype:
+    description: Lets the player change type of villager (Desert, Taiga, Swamp, Plain, Snow, Savanna, Jungle)
+    default: true
+  rvillagerwand.unemployment:
+    description: Lets the player reset the villager to 0 exp and no profession
+    default: false
+  rvillagerwand.wand:
+    description: Allow the player to use the /wand command
+    default: true
+  rvillagerwand.zombification:
+    description: Turns a villager into a zombie villager, cost 1 rotten flesh
+    default: true
