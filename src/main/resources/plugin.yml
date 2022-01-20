@@ -10,11 +10,19 @@ commands:
     usage: /<command>
     permission: rvillagerwand.wand
     permission-message: &cYou do not have the required permission for this command
+  wandreload:
+    description: Reload config
+    usage: /<command>
+    permission: rvillagerwand.reload
+    permission-message: &cYou do not have the required permission for this command
 
 permissions:
+  rvillagerwand.aware:
+    description: Lets the player toggle if villager can move around, villager will only be able to move around if hit or moved by other entity
+    default: true
   rvillagerwand.convertzombie:
-    description: Lets the player convert a zombiefied villager into a regular villager, for the cost of 1 Golden Apple, This will not give discounted prices
-    default: false
+    description: Lets the player convert a zombiefied villager into a regular villager, This will give discounted prices
+    default: true
   rvillagerwand.drop:
     description: Allow villager to drop its inventory when the wand is used to kill or force drop items from villager
     default: true
@@ -24,21 +32,24 @@ permissions:
   rvillagerwand.gethp:
     description: Gets the villagers hp
     default: true
+  rvillagerwand.giveexp:
+    description: Lets the player level up a villager
+    default: false
   rvillagerwand.glow:
-    description: Makes the villager glow, cost 1 glowstone
+    description: Toggle if villager should glow
     default: true
   rvillagerwand.heal:
     description: Lets the player heal the villager
     default: true
   rvillagerwand.kill:
-    description: Let the player kill villagers with the Villager Wand
+    description: Lets the player kill villagers with the Villager Wand
     default: true
   rvillagerwand.newtrades:
-    description: Lets the player get new trades without haveing to break and place the workstation
+    description: Lets the player get new trades without having to break and place the workstation
     default: true
   rvillagerwand.noitemsneeded:
-      description: Lets the player use the wand without the cost of some spells
-      default: false
+    description: Lets the player use the wand without the cost of some spells
+    default: false
   rvillagerwand.pickup:
     description: Lets the player pickup (Get a villager spawn egg) if the villager is grown up and has no profession
     default: true
@@ -55,11 +66,14 @@ permissions:
     description: Toggle if the villager can pick up items
     default: true
   rvillagerwand.togglesilent:
-      description: Lets the player toggle if villager should be silent
-      default: true
+    description: Lets the player toggle if villager should be silent
+    default: true
   rvillagerwand.toggletype:
     description: Lets the player change type of villager (Desert, Taiga, Swamp, Plain, Snow, Savanna, Jungle)
     default: true
+  rvillagerwand.toggleprofession:
+    description: Change villagers profession without the need of a workstation, only work if villager's exp is 0
+    default: false
   rvillagerwand.unemployment:
     description: Lets the player reset the villager to 0 exp and no profession
     default: false
@@ -67,5 +81,8 @@ permissions:
     description: Allow the player to use the /wand command
     default: true
   rvillagerwand.zombification:
-    description: Turns a villager into a zombie villager, cost 1 rotten flesh
+    description: Turns a villager into a zombie villager
     default: true
+  rvillagerwand.reload:
+    description: Reload config
+    default: false

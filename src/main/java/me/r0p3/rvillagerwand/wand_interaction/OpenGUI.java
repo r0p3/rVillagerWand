@@ -1,7 +1,8 @@
 package me.r0p3.rvillagerwand.wand_interaction;
 
-import me.r0p3.rvillagerwand.GUIConst;
 import me.r0p3.rvillagerwand.GUIItem;
+import me.r0p3.rvillagerwand.PlayerMessages;
+import me.r0p3.rvillagerwand.RVillagerWand;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -12,11 +13,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
+
 import java.util.List;
 
 public class OpenGUI implements Listener
 {
-    List<GUIItem> allGuiItems;
+    Plugin plugin = RVillagerWand.getPlugin(RVillagerWand.class);
+    public List<GUIItem> allGuiItems;
     public OpenGUI(List<GUIItem> guiItems)
     {
         this.allGuiItems = guiItems;
@@ -28,8 +32,10 @@ public class OpenGUI implements Listener
 
         try
         {
-            if ((e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR))
-                    && e.getPlayer().getInventory().getItemInMainHand().getItemMeta().getDisplayName().startsWith(GUIConst.DefaultWandName))
+            ItemStack mainHand = e.getPlayer().getInventory().getItemInMainHand();
+            if ((e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) && mainHand.getItemMeta() != null
+                    && mainHand.getItemMeta().getDisplayName().startsWith(PlayerMessages.textColor(plugin.getConfig().getString("WAND.Name")))&&
+                    mainHand.getType().equals(Material.getMaterial(plugin.getConfig().getString("WAND.Item"))))
             {
                 Player player = e.getPlayer();
                 Inventory GUI = createInventory(player);
@@ -47,7 +53,7 @@ public class OpenGUI implements Listener
     {
 
         int size = 0;
-        ItemStack[] guiItems = new ItemStack[18];
+        ItemStack[] guiItems = new ItemStack[27];
 
         for(GUIItem item : allGuiItems)
         {
@@ -58,7 +64,7 @@ public class OpenGUI implements Listener
             }
         }
 
-        Inventory GUI = Bukkit.createInventory(player, 18, GUIConst.GUITitle);
+        Inventory GUI = Bukkit.createInventory(player, 27, PlayerMessages.textColor(plugin.getConfig().getString("Menu_title")));
         GUI.setContents(guiItems);
         return GUI;
     }
@@ -71,5 +77,10 @@ public class OpenGUI implements Listener
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
+    }
+
+    public void update(List<GUIItem> newGuiList)
+    {
+        allGuiItems = newGuiList;
     }
 }

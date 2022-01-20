@@ -1,21 +1,20 @@
 package me.r0p3.rvillagerwand.wand_interaction;
 
-import me.r0p3.rvillagerwand.GUIConst;
 import me.r0p3.rvillagerwand.GUIItem;
+import me.r0p3.rvillagerwand.PlayerMessages;
+import me.r0p3.rvillagerwand.RVillagerWand;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class GUIClickItem implements Listener
 {
-    List<GUIItem> guiItems;
+    public List<GUIItem> guiItems;
     public GUIClickItem (List<GUIItem> guiItems)
     {
         this.guiItems = guiItems;
@@ -24,7 +23,7 @@ public class GUIClickItem implements Listener
     @EventHandler
     public void onItemClick(InventoryClickEvent e)
     {
-        if(e.getView().getTitle().equals(GUIConst.GUITitle))
+        if(e.getView().getTitle().equals(PlayerMessages.textColor(RVillagerWand.getPlugin(RVillagerWand.class).getConfig().getString("Menu_title"))))
         {
             Player player = (Player)e.getWhoClicked();
             ItemStack wand = player.getInventory().getItemInMainHand();

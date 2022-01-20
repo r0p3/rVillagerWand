@@ -1,27 +1,30 @@
 package me.r0p3.rvillagerwand.wand_interaction;
 
-import me.r0p3.rvillagerwand.GUIConst;
-import me.r0p3.rvillagerwand.GUIItem;
-import me.r0p3.rvillagerwand.Permissions;
-import me.r0p3.rvillagerwand.PlayerMessages;
+import me.r0p3.rvillagerwand.*;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import org.bukkit.Difficulty;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.*;
+import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Merchant;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.util.Vector;
 
 import java.util.List;
 
 public class UseWand implements Listener
 {
+    public List<GUIItem> guiItems;
+    Plugin plugin = RVillagerWand.getPlugin(RVillagerWand.class);
     Player player;
     Villager villager;
     ZombieVillager zombieVillager;
-    List<GUIItem> guiItems;
     public UseWand(List<GUIItem> guitems)
     {
         this.guiItems = guitems;
@@ -35,43 +38,48 @@ public class UseWand implements Listener
             player = (Player) e.getDamager();
             villager = (Villager) e.getEntity();
             ItemStack mainHand = player.getInventory().getItemInMainHand();
-            if(mainHand.hasItemMeta() && mainHand.getItemMeta().getDisplayName().startsWith(GUIConst.DefaultWandName))
+            if(mainHand.hasItemMeta() && mainHand.getItemMeta().getDisplayName().startsWith(PlayerMessages.textColor(plugin.getConfig().getString("WAND.Name"))))
             {
                 String wandName = player.getInventory().getItemInMainHand().getItemMeta().getDisplayName();
                 e.setCancelled(true);
 
-                if (wandName.equals(GUIItem.generateWandName(GUIConst.DropName)))
-                    dropInventory();
-                else if (wandName.equals(GUIItem.generateWandName(GUIConst.FollowName)))
+                if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("DROP.Name"))))
+                    dropInventory(false);
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("FOLLOW.Name"))))
                     toggleFollow();
-                else if (wandName.equals(GUIItem.generateWandName(GUIConst.GetHPName)))
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("GETHP.Name"))))
                     getHP();
-                else if (wandName.equals(GUIItem.generateWandName(GUIConst.GlowName)))
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("GLOW.Name"))))
                     glow();
-                else if (wandName.equals(GUIItem.generateWandName(GUIConst.HealName)))
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("GIVEEXP.Name"))))
+                    giveEXP();
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("HEAL.Name"))))
                     heal();
-                else if (wandName.equals(GUIItem.generateWandName(GUIConst.KillName)))
-                    {
-                        e.setCancelled(false);
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("KILL.Name"))))
                         kill();
-                    }
-                else if (wandName.equals(GUIItem.generateWandName(GUIConst.NewTradesName)))
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("NEWTRADES.Name"))))
                     newTrades();
-                else if (wandName.equals(GUIItem.generateWandName(GUIConst.PickupName)))
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("PICKUP.Name"))))
                     pickup();
-                else if (wandName.equals(GUIItem.generateWandName(GUIConst.ToggleAIName)))
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("TOGGLEAI.Name"))))
                     toggleAI();
-                else if (wandName.equals(GUIItem.generateWandName(GUIConst.ToggleInvisibleName)))
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("AWARE.Name"))))
+                    toggleAware();
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("TOGGLEINVISIBILITY.Name"))))
                     toggleInvisible();
-                else if (wandName.equals(GUIItem.generateWandName(GUIConst.ToggleInvulnerableName)))
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("TOGGLEINVULNERABLE.Name"))))
                     toggleInvulnerable();
-                else if (wandName.equals(GUIItem.generateWandName(GUIConst.TogglePickUpItemsName)))
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("TOGGLEPICKUPITEMS.Name"))))
                     togglePickUpItems();
-                else if (wandName.equals(GUIItem.generateWandName(GUIConst.ToggleSilentName)))
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("TOGGLEMUTE.Name"))))
                     toggleSilent();
-                else if (wandName.equals(GUIItem.generateWandName(GUIConst.ToggleTypeName)))
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("TOGGLECLOTHES.Name"))))
                     toggleType();
-                else if (wandName.equals(GUIItem.generateWandName(GUIConst.ZombificationName)))
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("TOGGLEPROFESSION.Name"))))
+                    toggleProfession();
+                else if(wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("UNEMPLOYMENT.Name"))))
+                    unemployment();
+                else if (wandName.equals(GUIItem.generateWandName(plugin.getConfig().getString("VILLAGERTOZOMBIE.Name"))))
                     zombification();
 
             }
@@ -81,7 +89,7 @@ public class UseWand implements Listener
             player = (Player) e.getDamager();
             zombieVillager = (ZombieVillager) e.getEntity();
             e.setCancelled(true);
-            if(player.getInventory().getItemInMainHand().getItemMeta().getDisplayName().equals((GUIItem.generateWandName(GUIConst.ConvertZombieName))))
+            if(player.getInventory().getItemInMainHand().getItemMeta().getDisplayName().equals((GUIItem.generateWandName(plugin.getConfig().getString("ZOMBIETOVILLAGER.Name")))))
             {
                 convertZombie();
             }
@@ -89,33 +97,49 @@ public class UseWand implements Listener
     }
 
     //PLAYER METHODS
-    private void dropInventory()
+    private void dropInventory(boolean killed)
     {
-        if(player.hasPermission(Permissions.DROP))
+        GUIItem guiItem = getGUIItem(Permissions.DROP);
+        if(killed || player.hasPermission(guiItem.Permission))
         {
+            boolean emptyInventory = true;
             for (ItemStack item : villager.getInventory().getContents())
                 if (item != null)
                 {
                     Bukkit.getWorld(villager.getWorld().getName()).dropItem(villager.getLocation(), item);
+                    emptyInventory = false;
                 }
+            if (!emptyInventory && (killed || removeItemInInventory(guiItem)))
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "DROP.Message");
+            else
+                if(!killed)
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "DROP.Empty_inventory_message");
             villager.getInventory().clear();
+
         }
         else noPermssion();
     }
 
     private void toggleFollow()
     {
-        if(player.hasPermission(Permissions.FOLLOW))
+        GUIItem guiItem = getGUIItem(Permissions.FOLLOW);
+        if(player.hasPermission(guiItem.Permission))
         {
-            if(villager.getTarget() == null || villager.getTarget() != player)
+            if (removeItemInInventory(guiItem))
             {
-                villager.setTarget(player);
-                PlayerMessages.sendMessage(player, "This villager will try to follow you");
-            }
-            else if (villager.getTarget().equals(player))
-            {
-                villager.setTarget(null);
-                PlayerMessages.sendMessage(player, "This villager will not follow you anymore");
+                if (player.hasPermission(Permissions.FOLLOW))
+                {
+                    if (villager.getTarget() == null || villager.getTarget() != player)
+                    {
+                        villager.setTarget(player);
+                        RVillagerWand.playerMessages.sendMessageFromConfig(player, "FOLLOW.Start_message");
+                    }
+                    else if (villager.getTarget().equals(player))
+                    {
+                        villager.setTarget(null);
+                        RVillagerWand.playerMessages.sendMessageFromConfig(player, "FOLLOW.Stop_message");
+                    }
+                }
             }
         }
         else noPermssion();
@@ -123,85 +147,135 @@ public class UseWand implements Listener
 
     private void getHP()
     {
-        if(player.hasPermission(Permissions.GETHP))
-            PlayerMessages.sendMessage(player, "This villagers HP is: " + villager.getHealth());
+        GUIItem guiItem = getGUIItem(Permissions.GETHP);
+        if(player.hasPermission(guiItem.Permission))
+        {
+            if (removeItemInInventory(guiItem))
+            {
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "GETHP.Message", "{hp}",  Math.round(villager.getHealth() *10.0)/10.0 + "");
+            }
+        }
     }
 
     private void glow()
     {
-        if(player.hasPermission(Permissions.GLOW))
+        GUIItem guiItem = getGUIItem(Permissions.GLOW);
+        if(player.hasPermission(guiItem.Permission))
         {
-            if(!villager.isGlowing())
+            if (removeItemInInventory(guiItem))
             {
-                for(GUIItem item : guiItems)
-                {
-                    if(item.Permission.equals(Permissions.GLOW))
-                    if (removeItemInInventory(item.MaterialCost, item.CostAmount))
-                        villager.setGlowing(true);
-                }
-            }
-            else
-            {
-                villager.setGlowing(false);
+                villager.setGlowing(!villager.isGlowing());
+                if(villager.isGlowing())
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "GLOW.Start_message", "{glow}", villager.isGlowing() + "");
+                else
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "GLOW.Stop_message", "{glow}", villager.isGlowing() + "");
             }
         }
     }
 
     private void heal()
     {
-        if(player.hasPermission(Permissions.HEAL))
+        GUIItem guiItem = getGUIItem(Permissions.HEAL);
+        if(player.hasPermission(guiItem.Permission))
         {
-            if(villager.getHealth() == 20)
+            if (villager.getHealth() != 20)
             {
-                PlayerMessages.sendMessage(player, "This villager is already fully healed");
+                if (removeItemInInventory(guiItem))
+                {
+                    villager.setHealth(20);
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "HEAL.Healed_message");
+                }
+            }
+            else
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "HEAL.Already_full_health_message");
+
+        }
+    }
+
+    private void giveEXP()
+    {
+        GUIItem guiItem = getGUIItem(Permissions.GIVEEXP);
+        if(player.hasPermission(guiItem.Permission))
+        {
+            if(villager.getProfession().equals(Villager.Profession.NONE) || villager.getProfession().equals(Villager.Profession.NITWIT))
+            {
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "GIVEEXP.No_proffesion_message", "{exp}", villager.getVillagerExperience() + "");
                 return;
             }
-            for(GUIItem item : guiItems)
-                if(item.Permission == Permissions.HEAL)
+
+            if (villager.getVillagerExperience() <= 250)
+            {
+
+                if (removeItemInInventory(guiItem))
                 {
-                    if(removeItemInInventory(item.MaterialCost, item.CostAmount))
-                    {
-                        villager.setHealth(20);
-                        PlayerMessages.sendMessage(player, "This villager has been healed");
-                        break;
-                    }
+                    villager.setVillagerExperience(villager.getVillagerExperience() + plugin.getConfig().getInt("GIVEEXP.EXP"));
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "GIVEEXP.GiveEXP_message", "{exp}", villager.getVillagerExperience() + "");
                 }
+            }
+            else
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "GIVEEXP.HighestEXP_message", "{exp}", villager.getVillagerExperience() + "");
 
         }
     }
 
     private void kill()
     {
-        if(player.hasPermission(Permissions.KILL))
+        GUIItem guiItem = getGUIItem(Permissions.KILL);
+        if(player.hasPermission(guiItem.Permission))
         {
-            if (player.hasPermission(Permissions.DROP))
-                dropInventory();
-            villager.setHealth(0);
-            PlayerMessages.sendMessage(player, "That poor villager didn't stand a chance");
+            if (removeItemInInventory(guiItem))
+            {
+                if (player.hasPermission(Permissions.DROP))
+                    dropInventory(plugin.getConfig().getBoolean("KILL.Drop"));
+                villager.remove();
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "KILL.Message");
+            }
         }
         else noPermssion();
     }
 
     private void newTrades()
     {
-        if(villager.isAdult() && (!villager.getProfession().equals(Villager.Profession.NONE) && !villager.getProfession().equals(Villager.Profession.NITWIT)) && villager.getVillagerExperience() == 0)
+        GUIItem guiItem = getGUIItem(Permissions.NEWTRADES);
+        if(player.hasPermission(guiItem.Permission))
         {
-            Villager.Profession profession = villager.getProfession();
-            villager.setProfession(Villager.Profession.NONE);
-            villager.setProfession(profession);
+            if (villager.isAdult() && (!villager.getProfession().equals(Villager.Profession.NONE) && !villager.getProfession().equals(Villager.Profession.NITWIT)) && villager.getVillagerExperience() == 0 && villager.getVillagerLevel() == 1)
+            {
+                if (removeItemInInventory(guiItem))
+                {
+                    Villager.Profession profession = villager.getProfession();
+                    villager.setProfession(Villager.Profession.NONE);
+                    villager.setProfession(profession);
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "NEWTRADES.Success_message");
+                }
+            }
+            else
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "NEWTRADES.Fail_message");
         }
-        else
-            PlayerMessages.sendMessage(player, net.md_5.bungee.api.ChatColor.RED + "This only works if the villager is an adult, has a profession and has 0 exp");
+        else noPermssion();
+
     }
 
     private void pickup()
     {
-        if(player.hasPermission(Permissions.PICKUP))
+        GUIItem guiItem = getGUIItem(Permissions.PICKUP);
+        if(player.hasPermission(guiItem.Permission))
         {
-            if (villager.isAdult() && (villager.getProfession() == Villager.Profession.NONE || villager.getProfession() == Villager.Profession.NITWIT))
+            if (!villager.isAdult())
+            {
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "PICKUP.Not_adult_message");
+                return;
+            }
+            if(villager.getProfession() != Villager.Profession.NONE && villager.getProfession() != Villager.Profession.NITWIT)
+            {
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "PICKUP.Has_profession_message");
+                return;
+            }
+            if (removeItemInInventory(guiItem))
             {
                 Bukkit.getWorld(villager.getWorld().getName()).dropItem(villager.getLocation(), new ItemStack(Material.VILLAGER_SPAWN_EGG));
                 villager.remove();
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "PICKUP.Message");
             }
         }
         else noPermssion();
@@ -209,138 +283,268 @@ public class UseWand implements Listener
 
     private void toggleAI()
     {
-        if(player.hasPermission(Permissions.TOGGLEAI))
+        GUIItem guiItem = getGUIItem(Permissions.TOGGLEAI);
+        if(player.hasPermission(guiItem.Permission))
         {
-            villager.setAI(!villager.hasAI());
-            PlayerMessages.sendMessage(player, "This villagers Ai is now set to: " + villager.hasAI());
+            if (removeItemInInventory(guiItem))
+            {
+                villager.setAI(!villager.hasAI());
+                if (villager.hasAI())
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "TOGGLEAI.On_message");
+                else
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "TOGGLEAI.Off_message");
+            }
         }
+        else noPermssion();
     }
 
     private void toggleInvisible()
     {
-        if(player.hasPermission(Permissions.TOGGLEINVISIBLE))
-            villager.setInvisible(!villager.isInvisible());
+        GUIItem guiItem = getGUIItem(Permissions.TOGGLEINVISIBLE);
+        if(player.hasPermission(guiItem.Permission))
+        {
+            if (removeItemInInventory(guiItem))
+            {
+                villager.setInvisible(!villager.isInvisible());
+                if (villager.isInvisible())
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "TOGGLEINVISIBILITY.Is_visible_message");
+                else
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "TOGGLEINVISIBILITY.Is_invisible_message");
+            }
+        }
+        else noPermssion();
     }
 
     private void toggleInvulnerable()
     {
-        if(player.hasPermission(Permissions.TOGGLEINVULNERABLE))
+        GUIItem guiItem = getGUIItem(Permissions.TOGGLEINVULNERABLE);
+        if(player.hasPermission(guiItem.Permission))
         {
-            villager.setInvulnerable(!villager.isInvulnerable());
-            PlayerMessages.sendMessage(player, "This villager invulnerability is now set to: " + villager.isInvulnerable());
+            if (removeItemInInventory(guiItem))
+            {
+                villager.setInvulnerable(!villager.isInvulnerable());
+                if (villager.isInvulnerable())
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "TOGGLEINVULNERABLE.Invulnerable_message");
+                else
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "TOGGLEINVULNERABLE.Vulnerable_message");
+            }
         }
+        else noPermssion();
     }
 
     private void togglePickUpItems()
     {
-        if(player.hasPermission(Permissions.TOGGLEPICKUPITEMS))
+        GUIItem guiItem = getGUIItem(Permissions.TOGGLEPICKUPITEMS);
+        if(player.hasPermission(guiItem.Permission))
         {
-            villager.setCanPickupItems(!villager.getCanPickupItems());
-            String message = (villager.getCanPickupItems())?"This villager can now pick up items":"This villager can't pick up items";
-            PlayerMessages.sendMessage(player, message);
+            if (removeItemInInventory(guiItem))
+            {
+                villager.setCanPickupItems(!villager.getCanPickupItems());
+                if (villager.getCanPickupItems())
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "TOGGLEPICKUPITEMS.Pickup_on_message");
+                else
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "TOGGLEPICKUPITEMS.Pickup_off_message");
+            }
         }
+        else noPermssion();
+    }
+
+    private void toggleAware()
+    {
+        GUIItem guiItem = getGUIItem(Permissions.AWARE);
+        if(player.hasPermission(guiItem.Permission))
+        {
+            if (removeItemInInventory(guiItem))
+            {
+                villager.setAware(!villager.isAware());
+                if (villager.isAware())
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "AWARE.On_message");
+                else
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "AWARE.Off_message");
+            }
+        }
+        else noPermssion();
     }
 
     private void toggleSilent()
     {
-        if(player.hasPermission(Permissions.TOGGLESILENT))
+        GUIItem guiItem = getGUIItem(Permissions.TOGGLESILENT);
+        if(player.hasPermission(guiItem.Permission))
         {
-            villager.setSilent(!villager.isSilent());
-            String message = (villager.isSilent())? "This villager is now silent" : "This villager is no longer silent";
-            PlayerMessages.sendMessage(player, message);
+            if (removeItemInInventory(guiItem))
+            {
+                villager.setSilent(!villager.isSilent());
+                if (villager.isSilent())
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "TOGGLEMUTE.Muted_message");
+                else
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "TOGGLEMUTE.Unmuted_message");
+            }
         }
+        else noPermssion();
     }
 
     private void toggleType()
     {
-        if(player.hasPermission(Permissions.TOGGLETYPE))
+        GUIItem guiItem = getGUIItem(Permissions.TOGGLETYPE);
+        if(player.hasPermission(guiItem.Permission))
         {
-            switch (villager.getVillagerType())
+            if (removeItemInInventory(guiItem))
             {
-                case PLAINS: villager.setVillagerType(Villager.Type.TAIGA);break;
-                case TAIGA: villager.setVillagerType(Villager.Type.SNOW);break;
-                case SNOW: villager.setVillagerType(Villager.Type.SWAMP);break;
-                case SWAMP: villager.setVillagerType(Villager.Type.DESERT);break;
-                case DESERT: villager.setVillagerType(Villager.Type.JUNGLE);break;
-                case JUNGLE: villager.setVillagerType(Villager.Type.SAVANNA);break;
-                case SAVANNA: villager.setVillagerType(Villager.Type.PLAINS);break;
+                switch (villager.getVillagerType())
+                {
+                    case PLAINS:villager.setVillagerType(Villager.Type.TAIGA);break;
+                    case TAIGA:villager.setVillagerType(Villager.Type.SNOW);break;
+                    case SNOW:villager.setVillagerType(Villager.Type.SWAMP);break;
+                    case SWAMP:villager.setVillagerType(Villager.Type.DESERT);break;
+                    case DESERT:villager.setVillagerType(Villager.Type.JUNGLE);break;
+                    case JUNGLE:villager.setVillagerType(Villager.Type.SAVANNA);break;
+                    case SAVANNA:villager.setVillagerType(Villager.Type.PLAINS);break;
+                }
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "TOGGLECLOTHES.Message", "{type}", villager.getVillagerType().name());
             }
+        }
+        else noPermssion();
+    }
+
+    private void toggleProfession()
+    {
+        GUIItem guiItem = getGUIItem(Permissions.TOGGLEPROFESSION);
+        if(player.hasPermission(guiItem.Permission))
+        {
+            if (removeItemInInventory(guiItem))
+            {
+                switch (villager.getProfession())
+                {
+                    case NONE:villager.setProfession(Villager.Profession.ARMORER);break;
+                    case ARMORER:villager.setProfession(Villager.Profession.BUTCHER);break;
+                    case BUTCHER:villager.setProfession(Villager.Profession.CARTOGRAPHER);break;
+                    case CARTOGRAPHER:villager.setProfession(Villager.Profession.CLERIC);break;
+                    case CLERIC:villager.setProfession(Villager.Profession.FARMER);break;
+                    case FARMER:villager.setProfession(Villager.Profession.FISHERMAN);break;
+                    case FISHERMAN:villager.setProfession(Villager.Profession.FLETCHER);break;
+                    case FLETCHER:villager.setProfession(Villager.Profession.LEATHERWORKER);break;
+                    case LEATHERWORKER:villager.setProfession(Villager.Profession.LIBRARIAN);break;
+                    case LIBRARIAN:villager.setProfession(Villager.Profession.MASON);break;
+                    case MASON:villager.setProfession(Villager.Profession.SHEPHERD);break;
+                    case SHEPHERD:villager.setProfession(Villager.Profession.TOOLSMITH);break;
+                    case TOOLSMITH:villager.setProfession(Villager.Profession.WEAPONSMITH);break;
+                    case WEAPONSMITH:villager.setProfession(Villager.Profession.NITWIT);break;
+                    case NITWIT:villager.setProfession(Villager.Profession.NONE);break;
+
+                }
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "TOGGLEPROFESSION.Message", "{type}", villager.getProfession().name());
+            }
+        }
+        else noPermssion();
+    }
+
+
+    private void unemployment()
+    {
+        GUIItem guiItem = getGUIItem(Permissions.UNEMPLOYMENT);
+        if(player.hasPermission(guiItem.Permission))
+        {
+            if(villager.getVillagerLevel() > 1 || villager.getVillagerExperience() > 0 || !villager.getProfession().equals(Villager.Profession.NONE))
+            {
+                if (removeItemInInventory(guiItem))
+                {
+                    Location l = villager.getMemory(MemoryKey.JOB_SITE);
+                    villager.setVillagerLevel(1);
+                    villager.setVillagerExperience(0);
+                    villager.setProfession(Villager.Profession.NONE);
+                    villager.setMemory(MemoryKey.JOB_SITE, null);
+                    if (l != null)
+                    {
+                        Block workstation = villager.getWorld().getBlockAt(l);
+                        Material workstationType = workstation.getType();
+                        workstation.setType(Material.AIR);
+                        workstation.setType(workstationType);
+                    }
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "UNEMPLOYMENT.Success_message");
+                }
+            }
+            else
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "UNEMPLOYMENT.Failed_message");
         }
         else noPermssion();
     }
 
     private void zombification()
     {
-        if(player.hasPermission(Permissions.ZOMBIFICATION))
+        GUIItem guiItem = getGUIItem(Permissions.ZOMBIFICATION);
+        if(player.hasPermission(guiItem.Permission))
         {
-            for (GUIItem item : guiItems)
+            if (villager.isAdult())
             {
-                if(item.Permission == Permissions.ZOMBIFICATION)
+                if (removeItemInInventory(guiItem))
                 {
-                    if (villager.isAdult() && (villager.getProfession().equals(Villager.Profession.NONE) || villager.getProfession().equals(Villager.Profession.NITWIT)))
-                    {
-                        if (removeItemInInventory(item.MaterialCost, item.CostAmount))
-                        {
-                            Entity entity = Bukkit.getWorld(villager.getWorld().getName()).spawnEntity(villager.getLocation(), EntityType.ZOMBIE_VILLAGER);
-                            ((ZombieVillager) entity).setAdult();
-                            ((ZombieVillager) entity).setVillagerProfession(Villager.Profession.NONE);
-                            villager.remove();
-                        }
-                    }
+                    Difficulty difficulty = player.getWorld().getDifficulty();
+                    Entity entity = Bukkit.getWorld(villager.getWorld().getName()).spawnEntity(villager.getLocation(), EntityType.ZOMBIE_VILLAGER);
+                    player.getWorld().setDifficulty(Difficulty.HARD);
+                    villager.damage(villager.getHealth(), entity);
+                    player.getWorld().setDifficulty(difficulty);
+                    entity.remove();
+
+                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "VILLAGERTOZOMBIE.Success_message");
                 }
             }
+            else
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "VILLAGERTOZOMBIE.Fail_message");
+
+
         }
         else noPermssion();
     }
 
     private void convertZombie()
     {
-        if(player.hasPermission(Permissions.CONVERTZOMBIE))
+        GUIItem guiItem = getGUIItem(Permissions.UNEMPLOYMENT);
+        if (player.hasPermission(guiItem.Permission))
         {
-            for (GUIItem item : guiItems)
-                if(item.Permission == Permissions.CONVERTZOMBIE)
-                {
-                    if(removeItemInInventory(item.MaterialCost, item.CostAmount))
-                    {
-                        zombieVillager.setConversionTime(0);
-                        break;
-                    }
-                }
+            if (removeItemInInventory(guiItem))
+            {
+                zombieVillager.setConversionTime(10);
+                zombieVillager.setConversionPlayer(player);
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "ZOMBIETOVILLAGER.Success_message");
+            }
         }
         else noPermssion();
     }
 
+    //TODO TEST IF THIS WORKDS
     //METHODS
-    private boolean removeItemInInventory(Material item, int amount)
+    private boolean removeItemInInventory(GUIItem guiItem)
     {
-        if(player.hasPermission(Permissions.NOITEMSNEEDED))
+        if(player.hasPermission(Permissions.NOITEMSNEEDED) || guiItem.MaterialCost == null && guiItem.CostAmount == 0)
             return true;
-
-        if(!player.getInventory().contains(item))
-            return false;
-        int counter = 0;
+        int totalAmount = 0;
         for (ItemStack itemStack : player.getInventory().getContents())
+            if(itemStack != null && itemStack.getType().equals(guiItem.MaterialCost))
+            {
+                totalAmount += itemStack.getAmount();
+                if(totalAmount >= guiItem.CostAmount)
+                    break;
+            }
+        if(totalAmount < guiItem.CostAmount || player.getInventory().removeItem(new ItemStack(guiItem.MaterialCost, guiItem.CostAmount)).size() != 0)
         {
-            if (itemStack.getType().equals(item))
-                counter += itemStack.getAmount();
-            if(counter >= amount)
-                break;
-        }
-        if(counter >= amount)
-        {
-            player.getInventory().removeItem(new ItemStack(item, amount));
-            return true;
-        }
-        else
-        {
-            PlayerMessages.sendMessage(player, ChatColor.RED + "You don't have the required items for this action: " + amount + " " + item.name());
+            if(plugin.getConfig().getBoolean("NOTENOUGHITEMS.Show_message"))
+                RVillagerWand.playerMessages.sendMessageFromConfig(player, "NOTENOUGHITEMS.Message");
             return false;
         }
-
+        return true;
     }
 
     private void noPermssion()
     {
-        PlayerMessages.sendMessagec(player, net.md_5.bungee.api.ChatColor.RED, "You do not have the required permission to use this wand");
+        if(plugin.getConfig().getBoolean("PERMSSION.Show_message"))
+            RVillagerWand.playerMessages.sendMessageFromConfig(player, "PERMSSION.Message");
+    }
+
+    private GUIItem getGUIItem(String permission)
+    {
+        for (GUIItem guiItem : guiItems)
+            if(guiItem.Permission.equals(permission))
+                return guiItem;
+        return null;
     }
 }

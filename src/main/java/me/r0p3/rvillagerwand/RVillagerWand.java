@@ -1,58 +1,215 @@
 package me.r0p3.rvillagerwand;
 
+import me.r0p3.rvillagerwand.commands.Reload;
 import me.r0p3.rvillagerwand.commands.Wand;
+import me.r0p3.rvillagerwand.events.VillagerInfiniteTrades;
 import me.r0p3.rvillagerwand.wand_interaction.GUIClickItem;
 import me.r0p3.rvillagerwand.wand_interaction.OpenGUI;
 import me.r0p3.rvillagerwand.wand_interaction.UseWand;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public final class RVillagerWand extends JavaPlugin
 {
-    List<GUIItem> guiItems = new ArrayList<>();
+    public List<GUIItem> guiItems = new ArrayList<>();
+    public static PlayerMessages playerMessages;
+
+    OpenGUI openGUI;
+    GUIClickItem guiClickItem;
+    UseWand useWand;
+
     @Override
     public void onEnable()
     {
-        try
-        {
-            guiItems = generateWands();
-            getCommand("wand").setExecutor(new Wand());
-            getServer().getPluginManager().registerEvents(new OpenGUI(guiItems), this);
-            getServer().getPluginManager().registerEvents(new GUIClickItem(guiItems), this);
-            getServer().getPluginManager().registerEvents(new UseWand(guiItems), this);
-        }
-        catch (Exception e)
-        {
-            Bukkit.getLogger().info(e.getMessage());
-        }
+
+        getConfig().options().copyDefaults();
+        saveDefaultConfig();
+        guiItems = generateWands();
+        openGUI = new OpenGUI(guiItems);
+        guiClickItem = new GUIClickItem(guiItems);
+        useWand = new UseWand(guiItems);
+
+        getServer().getPluginManager().registerEvents(openGUI, this);
+        getServer().getPluginManager().registerEvents(guiClickItem, this);
+        getServer().getPluginManager().registerEvents(useWand, this);
+        getServer().getPluginManager().registerEvents(new VillagerInfiniteTrades(), this);
+        getCommand("wand").setExecutor(new Wand());
+        getCommand("wandreload").setExecutor(new Reload(this, openGUI, guiClickItem, useWand));
+        playerMessages = new PlayerMessages();
     }
+
+    public void reload()
+    {
+        guiItems = generateWands();
+    }
+
 
     private List<GUIItem> generateWands()
     {
+        //CHANGE CLOTHES
         List<GUIItem> tempItems = new ArrayList<GUIItem>();
-        tempItems.add(new GUIItem(GUIConst.ToggleTypeName, Material.CHAINMAIL_CHESTPLATE, Arrays.asList(ChatColor.GREEN + "Change the villagers clothes"), null, 0, Permissions.TOGGLETYPE));
-        tempItems.add(new GUIItem(GUIConst.ConvertZombieName, Material.GOLDEN_APPLE, Arrays.asList(ChatColor.GREEN + "Turn zombiefied villager into villager"), Material.GOLDEN_APPLE, 1, Permissions.CONVERTZOMBIE));
-        tempItems.add(new GUIItem(GUIConst.ZombificationName, Material.ROTTEN_FLESH, Arrays.asList(ChatColor.GREEN + "Turn the villager into a zombie"), Material.ROTTEN_FLESH, 1, Permissions.ZOMBIFICATION));
-        tempItems.add(new GUIItem(GUIConst.DropName, Material.HOPPER, Arrays.asList(ChatColor.GREEN + "Villager will drop its inventory"), null, 0, Permissions.DROP));
-        tempItems.add(new GUIItem(GUIConst.FollowName, Material.LEAD, Arrays.asList(ChatColor.GREEN + "Toggle if villager will follow you"), null, 0, Permissions.FOLLOW));
-        tempItems.add(new GUIItem(GUIConst.GetHPName, Material.RED_WOOL, Arrays.asList(ChatColor.GREEN + "Gets the villagers HP"), null, 0, Permissions.GETHP));
-        tempItems.add(new GUIItem(GUIConst.GlowName, Material.GLOWSTONE, Arrays.asList(ChatColor.GREEN + "Toggle if villager should glow"), Material.GLOWSTONE, 1, Permissions.GLOW));
-        tempItems.add(new GUIItem(GUIConst.HealName, Material.BREAD, Arrays.asList(ChatColor.GREEN + "Fully heal the villager"), Material.BREAD, 1, Permissions.HEAL));
-        tempItems.add(new GUIItem(GUIConst.KillName, Material.LAVA_BUCKET, Arrays.asList(ChatColor.GREEN + "Kills the villager"), null, 0, Permissions.KILL));
-        tempItems.add(new GUIItem(GUIConst.NewTradesName, Material.WRITABLE_BOOK, Arrays.asList(ChatColor.GREEN + "Reset villagers trades, only works if villager has 0 exp"), null, 0, Permissions.NEWTRADES));
-        tempItems.add(new GUIItem(GUIConst.PickupName, Material.VILLAGER_SPAWN_EGG, Arrays.asList(ChatColor.GREEN + "Turn the villager into a spawn egg"), null, 0, Permissions.PICKUP));
-        tempItems.add(new GUIItem(GUIConst.ToggleAIName, Material.ENCHANTED_BOOK, Arrays.asList(ChatColor.GREEN + "Toggle if villagers AI is on"), null, 0, Permissions.TOGGLEAI));
-        tempItems.add(new GUIItem(GUIConst.ToggleInvisibleName, Material.POTION, Arrays.asList(ChatColor.GREEN + "Toggle if villager is invisible"), null, 0, Permissions.TOGGLEINVISIBLE));
-        tempItems.add(new GUIItem(GUIConst.ToggleInvulnerableName, Material.BEDROCK, Arrays.asList(ChatColor.GREEN + "Toggle if villager is invulnerable"), null, 0, Permissions.TOGGLEINVULNERABLE));
-        tempItems.add(new GUIItem(GUIConst.TogglePickUpItemsName, Material.CHEST, Arrays.asList(ChatColor.GREEN + "Toggle if villager can pick up items"), null, 0, Permissions.TOGGLEPICKUPITEMS));
-        tempItems.add(new GUIItem(GUIConst.ToggleSilentName, Material.WHITE_WOOL, Arrays.asList(ChatColor.GREEN + "Toggle if villager should be silent"), null, 0, Permissions.TOGGLESILENT));
-        tempItems.add(new GUIItem(GUIConst.UnemploymentName, Material.FIRE, Arrays.asList(ChatColor.GREEN + "Reset villager to 0 exp and no profession"), null, 0, Permissions.UNEMPLOYMENT));
+        tempItems.add(new GUIItem(getConfig().getString("TOGGLECLOTHES.Name"),
+                Material.getMaterial(getConfig().getString("TOGGLECLOTHES.Icon")),
+                (List<String>)getConfig().getList("TOGGLECLOTHES.Lore"),
+                Material.getMaterial(getConfig().getString("TOGGLECLOTHES.Item")),
+                getConfig().getInt("TOGGLECLOTHES.Amount"),
+                Permissions.TOGGLETYPE));
+
+        //CHANGE PROFESSION
+        tempItems.add(new GUIItem(getConfig().getString("TOGGLEPROFESSION.Name"),
+                Material.getMaterial(getConfig().getString("TOGGLEPROFESSION.Icon")),
+                (List<String>)getConfig().getList("TOGGLEPROFESSION.Lore"),
+                Material.getMaterial(getConfig().getString("TOGGLEPROFESSION.Item")),
+                getConfig().getInt("TOGGLEPROFESSION.Amount"),
+                Permissions.TOGGLEPROFESSION));
+
+        //AWARENESS
+        tempItems.add(new GUIItem(getConfig().getString("AWARE.Name"),
+                Material.getMaterial(getConfig().getString("AWARE.Icon")),
+                (List<String>)getConfig().getList("AWARE.Lore"),
+                Material.getMaterial(getConfig().getString("AWARE.Item")),
+                getConfig().getInt("AWARE.Amount"),
+                Permissions.AWARE));
+
+        //CONVERT ZOMBIE TO VILLAGER
+        tempItems.add(new GUIItem(getConfig().getString("ZOMBIETOVILLAGER.Name"),
+                Material.getMaterial(getConfig().getString("ZOMBIETOVILLAGER.Icon")),
+                (List<String>)getConfig().getList("ZOMBIETOVILLAGER.Lore"),
+                Material.getMaterial(getConfig().getString("ZOMBIETOVILLAGER.Item")),
+                getConfig().getInt("ZOMBIETOVILLAGER.Amount"),
+                Permissions.CONVERTZOMBIE));
+
+        //CONVERT VILLAGER TO ZOMBIE
+        tempItems.add(new GUIItem(getConfig().getString("VILLAGERTOZOMBIE.Name"),
+                Material.getMaterial(getConfig().getString("VILLAGERTOZOMBIE.Icon")),
+                (List<String>)getConfig().getList("VILLAGERTOZOMBIE.Lore"),
+                Material.getMaterial(getConfig().getString("VILLAGERTOZOMBIE.Item")),
+                getConfig().getInt("VILLAGERTOZOMBIE.Amount"),
+                Permissions.ZOMBIFICATION));
+
+        //Drop villagers inventory
+        tempItems.add(new GUIItem(getConfig().getString("DROP.Name"),
+                Material.getMaterial(getConfig().getString("DROP.Icon")),
+                (List<String>)getConfig().getList("DROP.Lore"),
+                Material.getMaterial(getConfig().getString("DROP.Item")),
+                getConfig().getInt("DROP.Amount"),
+                Permissions.DROP));
+
+        //FOLLOW
+        tempItems.add(new GUIItem(getConfig().getString("FOLLOW.Name"),
+                Material.getMaterial(getConfig().getString("FOLLOW.Icon")),
+                (List<String>)getConfig().getList("FOLLOW.Lore"),
+                Material.getMaterial(getConfig().getString("FOLLOW.Item")),
+                getConfig().getInt("FOLLOW.Amount"),
+                Permissions.FOLLOW));
+
+        //GET HP
+        tempItems.add(new GUIItem(getConfig().getString("GETHP.Name"),
+                Material.getMaterial(getConfig().getString("GETHP.Icon")),
+                (List<String>)getConfig().getList("GETHP.Lore"),
+                Material.getMaterial(getConfig().getString("GETHP.Item")),
+                getConfig().getInt("GETHP.Amount"),
+                Permissions.GETHP));
+
+        //GIVE EXP
+        tempItems.add(new GUIItem(getConfig().getString("GIVEEXP.Name"),
+                Material.getMaterial(getConfig().getString("GIVEEXP.Icon")),
+                (List<String>)getConfig().getList("GIVEEXP.Lore"),
+                Material.getMaterial(getConfig().getString("GIVEEXP.Item")),
+                getConfig().getInt("GIVEEXP.Amount"),
+                Permissions.GIVEEXP));
+
+        //GLOW
+        tempItems.add(new GUIItem(getConfig().getString("GLOW.Name"),
+                Material.getMaterial(getConfig().getString("GLOW.Icon")),
+                (List<String>)getConfig().getList("GLOW.Lore"),
+                Material.getMaterial(getConfig().getString("GLOW.Item")),
+                getConfig().getInt("GLOW.Amount"),
+                Permissions.GLOW));
+
+        //HEAL
+        tempItems.add(new GUIItem(getConfig().getString("HEAL.Name"),
+                Material.getMaterial(getConfig().getString("HEAL.Icon")),
+                (List<String>)getConfig().getList("HEAL.Lore"),
+                Material.getMaterial(getConfig().getString("HEAL.Item")),
+                getConfig().getInt("HEAL.Amount"),
+                Permissions.HEAL));
+
+        //KILL
+        tempItems.add(new GUIItem(getConfig().getString("KILL.Name"),
+                Material.getMaterial(getConfig().getString("KILL.Icon")),
+                (List<String>)getConfig().getList("KILL.Lore"),
+                Material.getMaterial(getConfig().getString("KILL.Item")),
+                getConfig().getInt("KILL.Amount"),
+                Permissions.KILL));
+
+        //NEW TRADES
+        tempItems.add(new GUIItem(getConfig().getString("NEWTRADES.Name"),
+                Material.getMaterial(getConfig().getString("NEWTRADES.Icon")),
+                (List<String>)getConfig().getList("NEWTRADES.Lore"),
+                Material.getMaterial(getConfig().getString("NEWTRADES.Item")),
+                getConfig().getInt("NEWTRADES.Amount"),
+                Permissions.NEWTRADES));
+
+        //PICKUP
+        tempItems.add(new GUIItem(getConfig().getString("PICKUP.Name"),
+                Material.getMaterial(getConfig().getString("PICKUP.Icon")),
+                (List<String>)getConfig().getList("PICKUP.Lore"),
+                Material.getMaterial(getConfig().getString("PICKUP.Item")),
+                getConfig().getInt("PICKUP.Amount"),
+                Permissions.PICKUP));
+
+        //TOGGLE AI
+        tempItems.add(new GUIItem(getConfig().getString("TOGGLEAI.Name"),
+                Material.getMaterial(getConfig().getString("TOGGLEAI.Icon")),
+                (List<String>)getConfig().getList("TOGGLEAI.Lore"),
+                Material.getMaterial(getConfig().getString("TOGGLEAI.Item")),
+                getConfig().getInt("TOGGLEAI.Amount"),
+                Permissions.TOGGLEAI));
+
+        //TOGGLEINVISIBILITY
+        tempItems.add(new GUIItem(getConfig().getString("TOGGLEINVISIBILITY.Name"),
+                Material.getMaterial(getConfig().getString("TOGGLEINVISIBILITY.Icon")),
+                (List<String>)getConfig().getList("TOGGLEINVISIBILITY.Lore"),
+                Material.getMaterial(getConfig().getString("TOGGLEINVISIBILITY.Item")),
+                getConfig().getInt("TOGGLEINVISIBILITY.Amount"),
+                Permissions.TOGGLEINVISIBLE));
+
+        //TOGGLEINVULNERABLE
+        tempItems.add(new GUIItem(getConfig().getString("TOGGLEINVULNERABLE.Name"),
+                Material.getMaterial(getConfig().getString("TOGGLEINVULNERABLE.Icon")),
+                (List<String>)getConfig().getList("TOGGLEINVULNERABLE.Lore"),
+                Material.getMaterial(getConfig().getString("TOGGLEINVULNERABLE.Item")),
+                getConfig().getInt("TOGGLEINVULNERABLE.Amount"),
+                Permissions.TOGGLEINVULNERABLE));
+
+        //TOGGLEPICKUPITEMS
+        tempItems.add(new GUIItem(getConfig().getString("TOGGLEPICKUPITEMS.Name"),
+                Material.getMaterial(getConfig().getString("TOGGLEPICKUPITEMS.Icon")),
+                (List<String>)getConfig().getList("TOGGLEPICKUPITEMS.Lore"),
+                Material.getMaterial(getConfig().getString("TOGGLEPICKUPITEMS.Item")),
+                getConfig().getInt("TOGGLEPICKUPITEMS.Amount"),
+                Permissions.TOGGLEPICKUPITEMS));
+
+        //TOGGLEMUTE
+        tempItems.add(new GUIItem(getConfig().getString("TOGGLEMUTE.Name"),
+                Material.getMaterial(getConfig().getString("TOGGLEMUTE.Icon")),
+                (List<String>)getConfig().getList("TOGGLEMUTE.Lore"),
+                Material.getMaterial(getConfig().getString("TOGGLEMUTE.Item")),
+                getConfig().getInt("TOGGLEMUTE.Amount"),
+                Permissions.TOGGLESILENT));
+
+        //UNEMPLOYMENT
+        tempItems.add(new GUIItem(getConfig().getString("UNEMPLOYMENT.Name"),
+                Material.getMaterial(getConfig().getString("UNEMPLOYMENT.Icon")),
+                (List<String>)getConfig().getList("UNEMPLOYMENT.Lore"),
+                Material.getMaterial(getConfig().getString("UNEMPLOYMENT.Item")),
+                getConfig().getInt("UNEMPLOYMENT.Amount"),
+                Permissions.UNEMPLOYMENT));
 
         return tempItems;
     }
