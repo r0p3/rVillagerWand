@@ -498,7 +498,7 @@ public class UseWand implements Listener
 
     private void convertZombie()
     {
-        GUIItem guiItem = getGUIItem(Permissions.UNEMPLOYMENT);
+        GUIItem guiItem = getGUIItem(Permissions.CONVERTZOMBIE);
         if (player.hasPermission(guiItem.Permission))
         {
             if (removeItemInInventory(guiItem))
