@@ -5,6 +5,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.List;
+
 public class PlayerMessages
 {
     private static Plugin plugin;
@@ -15,13 +17,18 @@ public class PlayerMessages
     }
 
 
-    public static void sendMessage(Player player, String message)
+    public void sendMessage(Player player, String message)
     {
         player.sendMessage(textColor(plugin.getConfig().getString("Prefix")) + message);
     }
-    public static void sendMessagec(Player player, ChatColor color, String message)
+    public void sendMessagec(Player player, ChatColor color, String message)
     {
         player.sendMessage(textColor(plugin.getConfig().getString("Prefix")) + color + message);
+    }
+
+    public String getConfigText(Player player, String configIndex)
+    {
+        return textColor(plugin.getConfig().getString(configIndex).replace("{player}", player.getName()));
     }
 
     public void sendMessageFromConfig(Player player, String configIndex)
@@ -36,6 +43,11 @@ public class PlayerMessages
         String message = plugin.getConfig().getString(configIndex);
         if(message != null && message != "")
             player.sendMessage(textColor(plugin.getConfig().getString("Prefix")) + textColor(message.replace("{player}", player.getName()).replace(replaceString, content)));
+    }
+
+    public String replace(String message, String itemToReplace, String replacement)
+    {
+        return message.replace(itemToReplace, replacement);
     }
 
 

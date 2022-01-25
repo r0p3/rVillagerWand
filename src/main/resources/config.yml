@@ -266,10 +266,15 @@ NEWTRADES:
   #Additional information to display on the wand
   Lore:
     - "&eReset Villager's trades"
-    - "§4Only works if the Villager has never traded"
+    - "&4Only works if the Villager has never traded"
+    - "&eHold enchanted book in offhand and the Villager"
+    - "&ewill try to make you an offer for that book"
 
-  #Message when Villager gets new trades
-  Success_message: ""
+  #If true only allow Success_message when a Villager is offering an enchanted book
+  Only_show_enchanted_books: false
+
+  #Message to display the new items the Villager has to offer, use {item} {price}
+  Success_message: "&eNow offering &3{item} &efor &a{price}"
 
   #Message if Villager has a profession and has not been traded with
   Fail_message: "&cThis spell only works if the Villager has a profession and has not been traded with!"

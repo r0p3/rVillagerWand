@@ -20,6 +20,7 @@ public class VillagerInfiniteTrades implements Listener
                 {
                     recipe.setUses(0);
                     recipe.setMaxUses(Integer.MAX_VALUE);
+                    recipe.setDemand(0);
                 }
             }
         }

@@ -7,10 +7,14 @@ import me.r0p3.rvillagerwand.wand_interaction.GUIClickItem;
 import me.r0p3.rvillagerwand.wand_interaction.OpenGUI;
 import me.r0p3.rvillagerwand.wand_interaction.UseWand;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public final class RVillagerWand extends JavaPlugin
@@ -40,6 +44,34 @@ public final class RVillagerWand extends JavaPlugin
         getCommand("wand").setExecutor(new Wand());
         getCommand("wandreload").setExecutor(new Reload(this, openGUI, guiClickItem, useWand));
         playerMessages = new PlayerMessages();
+
+        updateConfig();
+    }
+
+    private void updateConfig()
+    {
+        File fileOnDisk = new File(this.getDataFolder(), "config.yml");
+        FileConfiguration fileOnDiskConfiguration = YamlConfiguration.loadConfiguration(fileOnDisk);
+
+        for (String section : getConfig().getConfigurationSection("").getKeys(true))
+        {
+            if(fileOnDiskConfiguration.get(section) != null) continue;
+            fileOnDiskConfiguration.set(section, getConfig().get(section));
+        }
+        updateComments(fileOnDiskConfiguration);
+        try
+        {
+            fileOnDiskConfiguration.save(fileOnDisk);
+        }
+        catch (Exception e)
+        {
+            getServer().getLogger().warning("Error when trying to update config.yml");
+        }
+    }
+
+    private void updateComments(FileConfiguration fileOnDiskConfiguration)
+    {
+        fileOnDiskConfiguration.setComments("NEWTRADES.Only_show_enchanted_books", Arrays.asList("If true only allow Success_message when a Villager is offering an enchanted book"));
     }
 
     public void reload()

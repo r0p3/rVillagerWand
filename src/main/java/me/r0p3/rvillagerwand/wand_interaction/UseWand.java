@@ -6,6 +6,7 @@ import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.event.EventHandler;
@@ -13,6 +14,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
+import org.bukkit.inventory.MerchantRecipe;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
@@ -88,9 +91,9 @@ public class UseWand implements Listener
         {
             player = (Player) e.getDamager();
             zombieVillager = (ZombieVillager) e.getEntity();
-            e.setCancelled(true);
             if(player.getInventory().getItemInMainHand().getItemMeta().getDisplayName().equals((GUIItem.generateWandName(plugin.getConfig().getString("ZOMBIETOVILLAGER.Name")))))
             {
+                e.setCancelled(true);
                 convertZombie();
             }
         }
@@ -246,14 +249,74 @@ public class UseWand implements Listener
                     Villager.Profession profession = villager.getProfession();
                     villager.setProfession(Villager.Profession.NONE);
                     villager.setProfession(profession);
-                    RVillagerWand.playerMessages.sendMessageFromConfig(player, "NEWTRADES.Success_message");
+
+                    try
+                    {
+                    if(player.hasPermission(Permissions.GIVEBOOK))
+                    {
+                        if (player.getInventory().getItemInOffHand().getType().equals(Material.ENCHANTED_BOOK))
+                        {
+                            EnchantmentStorageMeta bookInHand = (EnchantmentStorageMeta) player.getInventory().getItemInOffHand().getItemMeta();
+                            breakpoint:
+                            for (int i = 0; i < 10000; i++)
+                            {
+                                profession = villager.getProfession();
+                                villager.setProfession(Villager.Profession.NONE);
+                                villager.setProfession(profession);
+                                for (MerchantRecipe merchantRecipe : villager.getRecipes())
+                                    if (merchantRecipe.getResult().getType().equals(Material.ENCHANTED_BOOK))
+                                    {
+                                        if (((EnchantmentStorageMeta)merchantRecipe.getResult().getItemMeta()).equals(bookInHand))
+                                        {
+                                            player.getInventory().setItemInOffHand(null);
+                                            break breakpoint;
+                                        }
+                                    }
+                            }
+                        }
+                    }
+
+                    }
+                    catch (Exception e)
+                    {
+                        Bukkit.getLogger().info(e.getMessage());
+                    }
+
+
+
+                        for (MerchantRecipe merchantRecipe : villager.getRecipes())
+                        {
+                            String message = RVillagerWand.playerMessages.getConfigText(player, "NEWTRADES.Success_message");
+                            message = message.replace("{price}", merchantRecipe.getResult().getAmount() + " "  +merchantRecipe.getResult().getType().name());
+                            String temp = "";
+                            for (ItemStack item : merchantRecipe.getIngredients())
+                                if(item.getType().name() != "AIR")
+                                    temp += item.getAmount() + " " + item.getType().name().replace("_", " ") + " & ";
+                            temp = temp.substring(0, temp.length()-3);
+                            message = message.replace("{item}", temp);
+                            if(plugin.getConfig().getBoolean("NEWTRADES.Only_show_enchanted_books") && !message.contains("ENCHANTED_BOOK"))
+                                message = "";
+                            if (merchantRecipe.getResult().getType().equals(Material.ENCHANTED_BOOK))
+                            {
+
+                                if (villager.getProfession().equals(Villager.Profession.LIBRARIAN))
+                                {
+                                    EnchantmentStorageMeta meta = (EnchantmentStorageMeta) merchantRecipe.getResult().getItemMeta();
+                                    message = message.replace("ENCHANTED_BOOK", meta.getStoredEnchants().keySet().toArray()[0].toString().split(":")[1].split(",")[0].replace("_", " ").toUpperCase() + " " +  meta.getStoredEnchants().values().toArray()[0]);
+                                }
+                            }
+                            if(message != "")
+                                RVillagerWand.playerMessages.sendMessage(player, message);
+
+
+                        }
+                    //RVillagerWand.playerMessages.sendMessageFromConfig(player, "NEWTRADES.Success_message");
                 }
             }
             else
                 RVillagerWand.playerMessages.sendMessageFromConfig(player, "NEWTRADES.Fail_message");
         }
         else noPermssion();
-
     }
 
     private void pickup()

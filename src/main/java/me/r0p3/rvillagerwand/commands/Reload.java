@@ -35,7 +35,7 @@ public class Reload implements CommandExecutor
             guiClickItem.guiItems = rVillagerWand.guiItems;
             useWand.guiItems = rVillagerWand.guiItems;
             if (sender instanceof Player)
-                PlayerMessages.sendMessage((Player) sender, ChatColor.GREEN + "rVillagerWand reloaded");
+                RVillagerWand.playerMessages.sendMessage((Player) sender, ChatColor.GREEN + "rVillagerWand reloaded");
         }
         return true;
     }

@@ -9,8 +9,9 @@ public class Permissions
     public static String DROP = PLUGINNAME+ "drop";
     public static String FOLLOW = PLUGINNAME+ "follow";
     public static String GETHP = PLUGINNAME+ "gethp";
-    public static String GLOW = PLUGINNAME+ "glow";
+    public static String GIVEBOOK = PLUGINNAME+ "givebook";
     public static String GIVEEXP = PLUGINNAME+ "giveexp";
+    public static String GLOW = PLUGINNAME+ "glow";
     public static String HEAL = PLUGINNAME+ "heal";
     public static String KILL = PLUGINNAME+ "kill";
     public static String NEWTRADES = PLUGINNAME+ "newtrades";

@@ -35,6 +35,9 @@ permissions:
   rvillagerwand.giveexp:
     description: Lets the player level up a villager
     default: false
+  rvillagerwand.givebook:
+    description: Give a book to a Villager and the Villager will offer that trade
+    default: true
   rvillagerwand.glow:
     description: Toggle if villager should glow
     default: true
