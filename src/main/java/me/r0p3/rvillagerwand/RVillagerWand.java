@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -37,10 +38,12 @@ public final class RVillagerWand extends JavaPlugin
         guiClickItem = new GUIClickItem(guiItems);
         useWand = new UseWand(guiItems);
 
-        getServer().getPluginManager().registerEvents(openGUI, this);
-        getServer().getPluginManager().registerEvents(guiClickItem, this);
-        getServer().getPluginManager().registerEvents(useWand, this);
-        getServer().getPluginManager().registerEvents(new VillagerInfiniteTrades(), this);
+        PluginManager pluginManager = getServer().getPluginManager();
+
+        pluginManager.registerEvents(openGUI, this);
+        pluginManager.registerEvents(guiClickItem, this);
+        pluginManager.registerEvents(useWand, this);
+        pluginManager.registerEvents(new VillagerInfiniteTrades(), this);
         getCommand("wand").setExecutor(new Wand());
         getCommand("wandreload").setExecutor(new Reload(this, openGUI, guiClickItem, useWand));
         playerMessages = new PlayerMessages();
@@ -52,11 +55,12 @@ public final class RVillagerWand extends JavaPlugin
     {
         File fileOnDisk = new File(this.getDataFolder(), "config.yml");
         FileConfiguration fileOnDiskConfiguration = YamlConfiguration.loadConfiguration(fileOnDisk);
+        FileConfiguration config = getConfig();
 
-        for (String section : getConfig().getConfigurationSection("").getKeys(true))
+        for (String section : config.getConfigurationSection("").getKeys(true))
         {
             if(fileOnDiskConfiguration.get(section) != null) continue;
-            fileOnDiskConfiguration.set(section, getConfig().get(section));
+            fileOnDiskConfiguration.set(section, config.get(section));
         }
         updateComments(fileOnDiskConfiguration);
         try
@@ -82,166 +86,210 @@ public final class RVillagerWand extends JavaPlugin
 
     private List<GUIItem> generateWands()
     {
-        //CHANGE CLOTHES
+
         List<GUIItem> tempItems = new ArrayList<GUIItem>();
-        tempItems.add(new GUIItem(getConfig().getString("TOGGLECLOTHES.Name"),
-                Material.getMaterial(getConfig().getString("TOGGLECLOTHES.Icon")),
-                (List<String>)getConfig().getList("TOGGLECLOTHES.Lore"),
-                Material.getMaterial(getConfig().getString("TOGGLECLOTHES.Item")),
-                getConfig().getInt("TOGGLECLOTHES.Amount"),
+
+        FileConfiguration config = getConfig();
+
+        //CHANGE CLOTHES
+        if (config.getBoolean("TOGGLECLOTHES.Show")) {
+            tempItems.add(new GUIItem(config.getString("TOGGLECLOTHES.Name"),
+                Material.getMaterial(config.getString("TOGGLECLOTHES.Icon")),
+                (List<String>)config.getList("TOGGLECLOTHES.Lore"),
+                Material.getMaterial(config.getString("TOGGLECLOTHES.Item")),
+                config.getInt("TOGGLECLOTHES.Amount"),
                 Permissions.TOGGLETYPE));
+        }
 
         //CHANGE PROFESSION
-        tempItems.add(new GUIItem(getConfig().getString("TOGGLEPROFESSION.Name"),
-                Material.getMaterial(getConfig().getString("TOGGLEPROFESSION.Icon")),
-                (List<String>)getConfig().getList("TOGGLEPROFESSION.Lore"),
-                Material.getMaterial(getConfig().getString("TOGGLEPROFESSION.Item")),
-                getConfig().getInt("TOGGLEPROFESSION.Amount"),
+        if (config.getBoolean("TOGGLEPROFESSION.Show")) {
+            tempItems.add(new GUIItem(config.getString("TOGGLEPROFESSION.Name"),
+                Material.getMaterial(config.getString("TOGGLEPROFESSION.Icon")),
+                (List<String>)config.getList("TOGGLEPROFESSION.Lore"),
+                Material.getMaterial(config.getString("TOGGLEPROFESSION.Item")),
+                config.getInt("TOGGLEPROFESSION.Amount"),
                 Permissions.TOGGLEPROFESSION));
+        }
 
         //AWARENESS
-        tempItems.add(new GUIItem(getConfig().getString("AWARE.Name"),
-                Material.getMaterial(getConfig().getString("AWARE.Icon")),
-                (List<String>)getConfig().getList("AWARE.Lore"),
-                Material.getMaterial(getConfig().getString("AWARE.Item")),
-                getConfig().getInt("AWARE.Amount"),
+        if (config.getBoolean("AWARE.Show")) {
+            tempItems.add(new GUIItem(config.getString("AWARE.Name"),
+                Material.getMaterial(config.getString("AWARE.Icon")),
+                (List<String>)config.getList("AWARE.Lore"),
+                Material.getMaterial(config.getString("AWARE.Item")),
+                config.getInt("AWARE.Amount"),
                 Permissions.AWARE));
+        }
 
         //CONVERT ZOMBIE TO VILLAGER
-        tempItems.add(new GUIItem(getConfig().getString("ZOMBIETOVILLAGER.Name"),
-                Material.getMaterial(getConfig().getString("ZOMBIETOVILLAGER.Icon")),
-                (List<String>)getConfig().getList("ZOMBIETOVILLAGER.Lore"),
-                Material.getMaterial(getConfig().getString("ZOMBIETOVILLAGER.Item")),
-                getConfig().getInt("ZOMBIETOVILLAGER.Amount"),
+        if (config.getBoolean("ZOMBIETOVILLAGER.Show")) {
+            tempItems.add(new GUIItem(config.getString("ZOMBIETOVILLAGER.Name"),
+                Material.getMaterial(config.getString("ZOMBIETOVILLAGER.Icon")),
+                (List<String>)config.getList("ZOMBIETOVILLAGER.Lore"),
+                Material.getMaterial(config.getString("ZOMBIETOVILLAGER.Item")),
+                config.getInt("ZOMBIETOVILLAGER.Amount"),
                 Permissions.CONVERTZOMBIE));
+        }
 
         //CONVERT VILLAGER TO ZOMBIE
-        tempItems.add(new GUIItem(getConfig().getString("VILLAGERTOZOMBIE.Name"),
-                Material.getMaterial(getConfig().getString("VILLAGERTOZOMBIE.Icon")),
-                (List<String>)getConfig().getList("VILLAGERTOZOMBIE.Lore"),
-                Material.getMaterial(getConfig().getString("VILLAGERTOZOMBIE.Item")),
-                getConfig().getInt("VILLAGERTOZOMBIE.Amount"),
+        if (config.getBoolean("VILLAGERTOZOMBIE.Show")) {
+            tempItems.add(new GUIItem(config.getString("VILLAGERTOZOMBIE.Name"),
+                Material.getMaterial(config.getString("VILLAGERTOZOMBIE.Icon")),
+                (List<String>)config.getList("VILLAGERTOZOMBIE.Lore"),
+                Material.getMaterial(config.getString("VILLAGERTOZOMBIE.Item")),
+                config.getInt("VILLAGERTOZOMBIE.Amount"),
                 Permissions.ZOMBIFICATION));
+        }
 
         //Drop villagers inventory
-        tempItems.add(new GUIItem(getConfig().getString("DROP.Name"),
-                Material.getMaterial(getConfig().getString("DROP.Icon")),
-                (List<String>)getConfig().getList("DROP.Lore"),
-                Material.getMaterial(getConfig().getString("DROP.Item")),
-                getConfig().getInt("DROP.Amount"),
+        if (config.getBoolean("DROP.Show")) {
+            tempItems.add(new GUIItem(config.getString("DROP.Name"),
+                Material.getMaterial(config.getString("DROP.Icon")),
+                (List<String>)config.getList("DROP.Lore"),
+                Material.getMaterial(config.getString("DROP.Item")),
+                config.getInt("DROP.Amount"),
                 Permissions.DROP));
+        }
 
         //FOLLOW
-        tempItems.add(new GUIItem(getConfig().getString("FOLLOW.Name"),
-                Material.getMaterial(getConfig().getString("FOLLOW.Icon")),
-                (List<String>)getConfig().getList("FOLLOW.Lore"),
-                Material.getMaterial(getConfig().getString("FOLLOW.Item")),
-                getConfig().getInt("FOLLOW.Amount"),
+        if (config.getBoolean("FOLLOW.Show")) {
+            tempItems.add(new GUIItem(config.getString("FOLLOW.Name"),
+                Material.getMaterial(config.getString("FOLLOW.Icon")),
+                (List<String>)config.getList("FOLLOW.Lore"),
+                Material.getMaterial(config.getString("FOLLOW.Item")),
+                config.getInt("FOLLOW.Amount"),
                 Permissions.FOLLOW));
+        }
 
         //GET HP
-        tempItems.add(new GUIItem(getConfig().getString("GETHP.Name"),
-                Material.getMaterial(getConfig().getString("GETHP.Icon")),
-                (List<String>)getConfig().getList("GETHP.Lore"),
-                Material.getMaterial(getConfig().getString("GETHP.Item")),
-                getConfig().getInt("GETHP.Amount"),
+        if (config.getBoolean("GETHP.Show")) {
+            tempItems.add(new GUIItem(config.getString("GETHP.Name"),
+                Material.getMaterial(config.getString("GETHP.Icon")),
+                (List<String>)config.getList("GETHP.Lore"),
+                Material.getMaterial(config.getString("GETHP.Item")),
+                config.getInt("GETHP.Amount"),
                 Permissions.GETHP));
+        }
 
         //GIVE EXP
-        tempItems.add(new GUIItem(getConfig().getString("GIVEEXP.Name"),
-                Material.getMaterial(getConfig().getString("GIVEEXP.Icon")),
-                (List<String>)getConfig().getList("GIVEEXP.Lore"),
-                Material.getMaterial(getConfig().getString("GIVEEXP.Item")),
-                getConfig().getInt("GIVEEXP.Amount"),
+        if (config.getBoolean("GIVEEXP.Show")) {
+            tempItems.add(new GUIItem(config.getString("GIVEEXP.Name"),
+                Material.getMaterial(config.getString("GIVEEXP.Icon")),
+                (List<String>)config.getList("GIVEEXP.Lore"),
+                Material.getMaterial(config.getString("GIVEEXP.Item")),
+                config.getInt("GIVEEXP.Amount"),
                 Permissions.GIVEEXP));
+        }
 
         //GLOW
-        tempItems.add(new GUIItem(getConfig().getString("GLOW.Name"),
-                Material.getMaterial(getConfig().getString("GLOW.Icon")),
-                (List<String>)getConfig().getList("GLOW.Lore"),
-                Material.getMaterial(getConfig().getString("GLOW.Item")),
-                getConfig().getInt("GLOW.Amount"),
+        if (config.getBoolean("GLOW.Show")) {
+            tempItems.add(new GUIItem(config.getString("GLOW.Name"),
+                Material.getMaterial(config.getString("GLOW.Icon")),
+                (List<String>)config.getList("GLOW.Lore"),
+                Material.getMaterial(config.getString("GLOW.Item")),
+                config.getInt("GLOW.Amount"),
                 Permissions.GLOW));
+        }
 
         //HEAL
-        tempItems.add(new GUIItem(getConfig().getString("HEAL.Name"),
-                Material.getMaterial(getConfig().getString("HEAL.Icon")),
-                (List<String>)getConfig().getList("HEAL.Lore"),
-                Material.getMaterial(getConfig().getString("HEAL.Item")),
-                getConfig().getInt("HEAL.Amount"),
+        if (config.getBoolean("HEAL.Show")) {
+            tempItems.add(new GUIItem(config.getString("HEAL.Name"),
+                Material.getMaterial(config.getString("HEAL.Icon")),
+                (List<String>)config.getList("HEAL.Lore"),
+                Material.getMaterial(config.getString("HEAL.Item")),
+                config.getInt("HEAL.Amount"),
                 Permissions.HEAL));
+        }
 
         //KILL
-        tempItems.add(new GUIItem(getConfig().getString("KILL.Name"),
-                Material.getMaterial(getConfig().getString("KILL.Icon")),
-                (List<String>)getConfig().getList("KILL.Lore"),
-                Material.getMaterial(getConfig().getString("KILL.Item")),
-                getConfig().getInt("KILL.Amount"),
+        if (config.getBoolean("KILL.Show")) {
+            tempItems.add(new GUIItem(config.getString("KILL.Name"),
+                Material.getMaterial(config.getString("KILL.Icon")),
+                (List<String>)config.getList("KILL.Lore"),
+                Material.getMaterial(config.getString("KILL.Item")),
+                config.getInt("KILL.Amount"),
                 Permissions.KILL));
+        }
 
         //NEW TRADES
-        tempItems.add(new GUIItem(getConfig().getString("NEWTRADES.Name"),
-                Material.getMaterial(getConfig().getString("NEWTRADES.Icon")),
-                (List<String>)getConfig().getList("NEWTRADES.Lore"),
-                Material.getMaterial(getConfig().getString("NEWTRADES.Item")),
-                getConfig().getInt("NEWTRADES.Amount"),
+        if (config.getBoolean("NEWTRADES.Show")) {
+            tempItems.add(new GUIItem(config.getString("NEWTRADES.Name"),
+                Material.getMaterial(config.getString("NEWTRADES.Icon")),
+                (List<String>)config.getList("NEWTRADES.Lore"),
+                Material.getMaterial(config.getString("NEWTRADES.Item")),
+                config.getInt("NEWTRADES.Amount"),
                 Permissions.NEWTRADES));
+        }
 
         //PICKUP
-        tempItems.add(new GUIItem(getConfig().getString("PICKUP.Name"),
-                Material.getMaterial(getConfig().getString("PICKUP.Icon")),
-                (List<String>)getConfig().getList("PICKUP.Lore"),
-                Material.getMaterial(getConfig().getString("PICKUP.Item")),
-                getConfig().getInt("PICKUP.Amount"),
+        if (config.getBoolean("PICKUP.Show")) {
+            tempItems.add(new GUIItem(config.getString("PICKUP.Name"),
+                Material.getMaterial(config.getString("PICKUP.Icon")),
+                (List<String>)config.getList("PICKUP.Lore"),
+                Material.getMaterial(config.getString("PICKUP.Item")),
+                config.getInt("PICKUP.Amount"),
                 Permissions.PICKUP));
+        }
 
         //TOGGLE AI
-        tempItems.add(new GUIItem(getConfig().getString("TOGGLEAI.Name"),
-                Material.getMaterial(getConfig().getString("TOGGLEAI.Icon")),
-                (List<String>)getConfig().getList("TOGGLEAI.Lore"),
-                Material.getMaterial(getConfig().getString("TOGGLEAI.Item")),
-                getConfig().getInt("TOGGLEAI.Amount"),
+        if (config.getBoolean("TOGGLEAI.Show")) {
+            tempItems.add(new GUIItem(config.getString("TOGGLEAI.Name"),
+                Material.getMaterial(config.getString("TOGGLEAI.Icon")),
+                (List<String>)config.getList("TOGGLEAI.Lore"),
+                Material.getMaterial(config.getString("TOGGLEAI.Item")),
+                config.getInt("TOGGLEAI.Amount"),
                 Permissions.TOGGLEAI));
+        }
 
         //TOGGLEINVISIBILITY
-        tempItems.add(new GUIItem(getConfig().getString("TOGGLEINVISIBILITY.Name"),
-                Material.getMaterial(getConfig().getString("TOGGLEINVISIBILITY.Icon")),
-                (List<String>)getConfig().getList("TOGGLEINVISIBILITY.Lore"),
-                Material.getMaterial(getConfig().getString("TOGGLEINVISIBILITY.Item")),
-                getConfig().getInt("TOGGLEINVISIBILITY.Amount"),
+        if (config.getBoolean("TOGGLEINVISIBILITY.Show")) {
+            tempItems.add(new GUIItem(config.getString("TOGGLEINVISIBILITY.Name"),
+                Material.getMaterial(config.getString("TOGGLEINVISIBILITY.Icon")),
+                (List<String>)config.getList("TOGGLEINVISIBILITY.Lore"),
+                Material.getMaterial(config.getString("TOGGLEINVISIBILITY.Item")),
+                config.getInt("TOGGLEINVISIBILITY.Amount"),
                 Permissions.TOGGLEINVISIBLE));
+        }
 
         //TOGGLEINVULNERABLE
-        tempItems.add(new GUIItem(getConfig().getString("TOGGLEINVULNERABLE.Name"),
-                Material.getMaterial(getConfig().getString("TOGGLEINVULNERABLE.Icon")),
-                (List<String>)getConfig().getList("TOGGLEINVULNERABLE.Lore"),
-                Material.getMaterial(getConfig().getString("TOGGLEINVULNERABLE.Item")),
-                getConfig().getInt("TOGGLEINVULNERABLE.Amount"),
+        if (config.getBoolean("TOGGLEINVULNERABLE.Show")) {
+            tempItems.add(new GUIItem(config.getString("TOGGLEINVULNERABLE.Name"),
+                Material.getMaterial(config.getString("TOGGLEINVULNERABLE.Icon")),
+                (List<String>)config.getList("TOGGLEINVULNERABLE.Lore"),
+                Material.getMaterial(config.getString("TOGGLEINVULNERABLE.Item")),
+                config.getInt("TOGGLEINVULNERABLE.Amount"),
                 Permissions.TOGGLEINVULNERABLE));
+        }
 
         //TOGGLEPICKUPITEMS
-        tempItems.add(new GUIItem(getConfig().getString("TOGGLEPICKUPITEMS.Name"),
-                Material.getMaterial(getConfig().getString("TOGGLEPICKUPITEMS.Icon")),
-                (List<String>)getConfig().getList("TOGGLEPICKUPITEMS.Lore"),
-                Material.getMaterial(getConfig().getString("TOGGLEPICKUPITEMS.Item")),
-                getConfig().getInt("TOGGLEPICKUPITEMS.Amount"),
+        if (config.getBoolean("TOGGLEPICKUPITEMS.Show")) {
+            tempItems.add(new GUIItem(config.getString("TOGGLEPICKUPITEMS.Name"),
+                Material.getMaterial(config.getString("TOGGLEPICKUPITEMS.Icon")),
+                (List<String>)config.getList("TOGGLEPICKUPITEMS.Lore"),
+                Material.getMaterial(config.getString("TOGGLEPICKUPITEMS.Item")),
+                config.getInt("TOGGLEPICKUPITEMS.Amount"),
                 Permissions.TOGGLEPICKUPITEMS));
+        }
 
         //TOGGLEMUTE
-        tempItems.add(new GUIItem(getConfig().getString("TOGGLEMUTE.Name"),
-                Material.getMaterial(getConfig().getString("TOGGLEMUTE.Icon")),
-                (List<String>)getConfig().getList("TOGGLEMUTE.Lore"),
-                Material.getMaterial(getConfig().getString("TOGGLEMUTE.Item")),
-                getConfig().getInt("TOGGLEMUTE.Amount"),
+        if (config.getBoolean("TOGGLEMUTE.Show")) {
+            tempItems.add(new GUIItem(config.getString("TOGGLEMUTE.Name"),
+                Material.getMaterial(config.getString("TOGGLEMUTE.Icon")),
+                (List<String>)config.getList("TOGGLEMUTE.Lore"),
+                Material.getMaterial(config.getString("TOGGLEMUTE.Item")),
+                config.getInt("TOGGLEMUTE.Amount"),
                 Permissions.TOGGLESILENT));
+        }
 
         //UNEMPLOYMENT
-        tempItems.add(new GUIItem(getConfig().getString("UNEMPLOYMENT.Name"),
-                Material.getMaterial(getConfig().getString("UNEMPLOYMENT.Icon")),
-                (List<String>)getConfig().getList("UNEMPLOYMENT.Lore"),
-                Material.getMaterial(getConfig().getString("UNEMPLOYMENT.Item")),
-                getConfig().getInt("UNEMPLOYMENT.Amount"),
+        if (config.getBoolean("UNEMPLOYMENT.Show")) {
+            tempItems.add(new GUIItem(config.getString("UNEMPLOYMENT.Name"),
+                Material.getMaterial(config.getString("UNEMPLOYMENT.Icon")),
+                (List<String>)config.getList("UNEMPLOYMENT.Lore"),
+                Material.getMaterial(config.getString("UNEMPLOYMENT.Item")),
+                config.getInt("UNEMPLOYMENT.Amount"),
                 Permissions.UNEMPLOYMENT));
+        }
 
         return tempItems;
     }

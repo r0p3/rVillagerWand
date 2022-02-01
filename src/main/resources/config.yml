@@ -76,6 +76,9 @@ DROP:
   #If Villager doesn't have any item in its inventory
   Empty_inventory_message: "&eInventory is already empty"
 
+  #If you want this option to show in the menu
+  Show: true
+
   #Item to pay with for using this spell
   Item:
 
@@ -106,6 +109,9 @@ FOLLOW:
   #Villager stop follow message
   Stop_message: "This Villager will not follow you anymore"
 
+  #If you want this option to show in the menu
+  Show: true
+
   #Item to pay with for using this spell
   Item:
 
@@ -129,6 +135,9 @@ GETHP: #Use {hp} to get Villager's hp
 
   #Message when checking hp
   Message: "&3This Villager's HP is: &a{hp}"
+
+  #If you want this option to show in the menu
+  Show: true
 
   #Item to pay with for using this spell
   Item:
@@ -161,6 +170,9 @@ GIVEEXP:
   #Message when the Villager is the highest level
   No_proffesion_message: "The Villager needs to have a profession"
 
+  #If you want this option to show in the menu
+  Show: true
+
   #Item to pay with for using this spell
   Item: EXPERIENCE_BOTTLE
 
@@ -191,6 +203,9 @@ GLOW:
   #Message when glow effect is removed
   Stop_message: ""
 
+  #If you want this option to show in the menu
+  Show: true
+
   #Item to pay with for using this spell
   Item:
 
@@ -217,6 +232,9 @@ HEAL:
 
   #If villager already is fully healed
   Already_full_health_message: "&eThis Villager is already fully &ahealed"
+
+  #If you want this option to show in the menu
+  Show: true
 
   #Item to pay with for using this spell
   Item: BREAD
@@ -245,6 +263,9 @@ KILL:
 
   #When villager is killed
   Message: "&cThat poor Villager didn't stand a chance"
+
+  #If you want this option to show in the menu
+  Show: true
 
   #Item to pay with for using this spell
   Item:
@@ -279,6 +300,9 @@ NEWTRADES:
   #Message if Villager has a profession and has not been traded with
   Fail_message: "&cThis spell only works if the Villager has a profession and has not been traded with!"
 
+  #If you want this option to show in the menu
+  Show: true
+
   #Item to pay with for using this spell
   Item:
 
@@ -309,6 +333,9 @@ PICKUP:
   #Message if villager has a profession
   Has_profession_message: "&cYou can only pick up Villagers who doesn't have a profession"
 
+  #If you want this option to show in the menu
+  Show: true
+
   #Item to pay with for using this spell
   Item:
 
@@ -335,6 +362,9 @@ TOGGLEAI:
 
   #Message when AI is turned off
   Off_message: ""
+
+  #If you want this option to show in the menu
+  Show: true
 
   #Item to pay with for using this spell
   Item:
@@ -364,6 +394,9 @@ AWARE:
   #Message when awareness is turned off
   Off_message: "&eThis villager's awareness is turned &coff"
 
+  #If you want this option to show in the menu
+  Show: true
+
   #Item to pay with for using this spell
   Item:
 
@@ -390,6 +423,9 @@ TOGGLEINVISIBILITY:
 
   #Message when villager is set to visible
   Is_visible_message: ""
+
+  #If you want this option to show in the menu
+  Show: true
 
   #Item cost to use this spell
   Item:
@@ -420,6 +456,9 @@ TOGGLEINVULNERABLE:
   #Message when villager is set to vulnerable
   Vulnerable_message: ""
 
+  #If you want this option to show in the menu
+  Show: true
+
   #Item to pay with for using this spell
   Item:
 
@@ -446,6 +485,9 @@ TOGGLEPICKUPITEMS:
 
   #Message when pick up is turned off
   Pickup_off_message: ""
+
+  #If you want this option to show in the menu
+  Show: true
 
   #Item to pay with for using this spell
   Item:
@@ -474,6 +516,9 @@ TOGGLEMUTE:
   #Message when villager is unmuted
   Unmuted_message: "&eVillager is now &aunmuted"
 
+  #If you want this option to show in the menu
+  Show: true
+
   #Item to pay with for using this spell
   Item:
 
@@ -498,6 +543,9 @@ TOGGLECLOTHES: #Use {type} to get villager type
   #Message when changing clothes
   #Use {type} to get the new Villager type
   Message: ""
+
+  #If you want this option to show in the menu
+  Show: true
 
   #Item to pay with for using this spell
   Item:
@@ -525,6 +573,9 @@ TOGGLEPROFESSION: #Use {type} to get villager type
   #Message when changing clothes
   #Use {type} to get the new Villager type
   Message: ""
+
+  #If you want this option to show in the menu
+  Show: true
 
   #Item to pay with for using this spell
   Item:
@@ -554,6 +605,9 @@ UNEMPLOYMENT:
   #Message when Villager has experience
   Failed_message: "&cThis Villager is already unemployed"
 
+  #If you want this option to show in the menu
+  Show: true
+
   #Item to pay with for using this spell
   Item:
 
@@ -577,6 +631,9 @@ ZOMBIETOVILLAGER:
 
   #Message when converting a Zombiefied Villager into a Villager
   Message: ""
+
+  #If you want this option to show in the menu
+  Show: true
 
   #Item to pay with for using this spell
   Item: GOLDEN_APPLE
@@ -604,6 +661,9 @@ VILLAGERTOZOMBIE:
 
   #Message if Villager isn't an adult
   Fail_message: "&cYou can only turn adult Villagers into a Zombified Villager"
+
+  #If you want this option to show in the menu
+  Show: true
 
   #Item to pay with for using this spell
   Item: ROTTEN_FLESH
